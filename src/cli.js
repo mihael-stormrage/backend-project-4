@@ -9,6 +9,6 @@ program.name('page-loader').version('1.0.0')
   .description('Page loader utility')
   .arguments('<url>')
   .option('-o --output [dir]', 'output dir', cwd)
-  .action((url) => console.log(pageLoader(url, program.opts().output)));
+  .action(async (url) => console.log(await pageLoader(new URL(url), program.opts().output)));
 
 export default program;
