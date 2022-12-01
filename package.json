@@ -1,6 +1,6 @@
 {
   "name": "@hexlet/code",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "main": "src/index.js",
   "repository": "git@github.com:mihael-stormrage/backend-project-4.git",

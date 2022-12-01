@@ -9,14 +9,17 @@ import program from '../src/cli.js';
 nock.disableNetConnect();
 
 const getFixturePath = (file) => path.join('__fixtures__', file);
-const getFixture = (file) => fs.readFile(getFixturePath(file), 'utf-8');
+const getFixture = (file, encoding = 'utf-8') => fs.readFile(getFixturePath(file), encoding);
 
 let url;
 let tmpdir;
+let img;
 
 beforeAll(async () => {
   url = new URL('https://ru.hexlet.io/courses');
-  nock(url.origin).get(url.pathname).reply(200, await getFixture('html.html'));
+  img = await getFixture('nodejs.png', null);
+  nock(url.origin).get(url.pathname).reply(200, await getFixture('ru-hexlet-io-courses.initial.html'));
+  nock(url.origin).get(/\/assets\/.+/).reply(200, img);
 });
 
 beforeEach(async () => {
@@ -28,14 +31,17 @@ afterEach(async () => {
 });
 
 test('filepath should be kebab-case', () => {
-  expect(makeFileName(url)).toBe('ru-hexlet-io-courses.html');
+  expect(makeFileName(url)).toBe('ru-hexlet-io-courses');
 });
 
-test('should generate file in out dir', async () => {
+test('should generate files in out dir', async () => {
   const filepath = await pageLoader(url.href, tmpdir);
   const file = await fs.readFile(filepath, 'utf-8');
-  const $ = cheerio.load(file, null, false);
-  expect($('img').attr().src).toBe('https://freenaturestock.com/wp-content/uploads/freenaturestock-2086-1024x589.jpg');
+  const $ = cheerio.load(file);
+  const savedImgPath = path.join(tmpdir, $('img').attr().src);
+  const savedImg = await fs.readFile(savedImgPath);
+  expect(file).toBe(cheerio.load(await getFixture('ru-hexlet-io-courses.html')).html());
+  expect(savedImg).toStrictEqual(img);
 });
 
 test('should output help', async () => {
