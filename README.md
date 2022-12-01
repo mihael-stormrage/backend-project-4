@@ -20,4 +20,4 @@ Web-scrapper library with CLI
 
 For installation, testing and other purposes see [Makefile](./Makefile)
 
-[![asciicast](docs/demo.svg)](https://asciinema.org/a/ezyBzHxsA7HUZ1HhIRDDrc2Xa)
+[![asciicast](docs/demo.svg)](https://asciinema.org/a/X5wPwKIRhnuW5NeNf6NqeyGaw)
