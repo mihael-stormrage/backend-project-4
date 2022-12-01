@@ -32,7 +32,7 @@ test('filepath should be kebab-case', () => {
 });
 
 test('should generate file in out dir', async () => {
-  const filepath = await pageLoader(url, tmpdir);
+  const filepath = await pageLoader(url.href, tmpdir);
   const file = await fs.readFile(filepath, 'utf-8');
   const $ = cheerio.load(file, null, false);
   expect($('img').attr().src).toBe('https://freenaturestock.com/wp-content/uploads/freenaturestock-2086-1024x589.jpg');
