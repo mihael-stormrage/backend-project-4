@@ -1,10 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import kebabCase from 'lodash/kebabCase.js';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-export const makeFileName = ({ hostname, pathname }) => `${kebabCase(`${hostname}${pathname}`)}`;
+export const makeFileName = ({ hostname, pathname }) => `${hostname}${pathname}`.replace(/[./]/g, '-');
 
 export default (url, out = process.cwd()) => axios(url).then(({ data }) => {
   const urlObject = new URL(url);
