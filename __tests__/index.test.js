@@ -13,13 +13,22 @@ const getFixture = (file, encoding = 'utf-8') => fs.readFile(getFixturePath(file
 
 let url;
 let tmpdir;
-let img;
+let htmlFixture;
+let imgFixture;
+let cssFixture;
+let jsFixture;
 
 beforeAll(async () => {
   url = new URL('https://ru.hexlet.io/courses');
-  img = await getFixture('nodejs.png', null);
-  nock(url.origin).get(url.pathname).reply(200, await getFixture('ru-hexlet-io-courses.initial.html'));
-  nock(url.origin).get(/\/assets\/.+/).reply(200, img);
+  htmlFixture = await getFixture('ru-hexlet-io-courses.initial.html');
+  imgFixture = await getFixture('nodejs.png', null);
+  cssFixture = await getFixture('application.css');
+  jsFixture = await getFixture('runtime.js');
+  const pNock = nock(url.origin).persist();
+  pNock.get(url.pathname).reply(200, htmlFixture);
+  pNock.get(/\/assets\/.+?\.png/).reply(200, imgFixture);
+  pNock.get(/\/assets\/.+?\.css/).reply(200, cssFixture);
+  pNock.get(/\/packs\/js\/.+?\.js/).reply(200, jsFixture);
 });
 
 beforeEach(async () => {
@@ -38,10 +47,18 @@ test('should generate files in out dir', async () => {
   const filepath = await pageLoader(url.href, tmpdir);
   const file = await fs.readFile(filepath, 'utf-8');
   const $ = cheerio.load(file);
+
   const savedImgPath = path.join(tmpdir, $('img').attr().src);
+  const savedLinkPath = path.join(tmpdir, $('link:nth-of-type(2)').attr().href);
+  const savedScriptPath = path.join(tmpdir, $('script:last-child').attr().src);
   const savedImg = await fs.readFile(savedImgPath);
+  const savedLink = await fs.readFile(savedLinkPath, 'utf8');
+  const savedScript = await fs.readFile(savedScriptPath, 'utf8');
+
   expect(file).toBe(cheerio.load(await getFixture('ru-hexlet-io-courses.html')).html());
-  expect(savedImg).toStrictEqual(img);
+  expect(savedImg).toStrictEqual(imgFixture);
+  expect(savedLink).toStrictEqual(cssFixture);
+  expect(savedScript).toStrictEqual(jsFixture);
 });
 
 test('should output help', async () => {
