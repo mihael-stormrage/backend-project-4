@@ -4,8 +4,11 @@ install:
 start: install
 	npm start
 
+debug:
+	DEBUG=axios,page-loader npm start
+
 test:
-	npm test
+	DEBUG=axios,nock.*,page-loader npm test
 
 coverage:
 	npm test -- --coverage
@@ -16,10 +19,17 @@ lint:
 record:
 	asciinema rec -c "docs/screencast.sh" docs/demo.cast --overwrite
 
+record-debug:
+	asciinema rec -c "docs/screencast.debug.sh" docs/debug.cast --overwrite
+
 publish-record:
 	asciinema upload docs/demo.cast
 
-svg: record
+publish-record-debug:
+	asciinema upload docs/debug.cast
+
+svg:
 	svg-term --in docs/demo.cast --out docs/demo.svg --no-cursor --width 80 --height 20 --window
+	svg-term --in docs/debug.cast --out docs/debug.svg --no-cursor --width 80 --height 20 --window
 
 .PHONY: coverage

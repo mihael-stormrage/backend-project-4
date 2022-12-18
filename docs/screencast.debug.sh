@@ -12,17 +12,14 @@ __dirname=$(dirname $__filename)
 clear
 
 # script
-pe "page-loader -h"
 PROMPT_TIMEOUT=3
+pe "DEBUG=page-loader page-loader -o tmp https://ru.hexlet.io/courses"
 wait
 clear
-p "page-loader -o tmp https://ru.hexlet.io/courses"
-echo "tmp/ru-hexlet-io-courses.html"
-p
-pe "ls -1R tmp"
+pe "DEBUG=page-loader page-loader -o tmp https://scrapeme.live/shop/"
 wait
 clear
-pe 'cat tmp/ru-hexlet-io-courses.html | grep -E "\<img|\<link|\<script" | bat -l html'
+pe "DEBUG=axios,nock.*,page-loader make test"
 
 #PROMPT_TIMEOUT=3
 wait

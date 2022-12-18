@@ -2,4 +2,4 @@ node_modules/
 coverage/
 tmp/
 
-/docs/demo.cast
+/docs/*.cast
