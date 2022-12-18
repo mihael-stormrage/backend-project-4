@@ -67,3 +67,21 @@ test('should output help', async () => {
     .replace(/(?<=default:)\s+"\/.+?"/, ' "/home/user/current-dir"');
   expect(actual).toBe(help);
 });
+
+/* TODO
+ * Test exceptions:
+ * - library should throw
+ * - script should fail gracefully with:
+ *   - proper exit code
+ *   - user-friendly message
+ *
+ * test cases:
+ *   $ page-loader -o /etc https://scrapeme.live/shop/
+ *   > Permission denied: /etc/scrapeme-live-shop_files
+ *
+ *   $ page-loader -o /baz https://scrapeme.live/shop/
+ *   > Output directory '/baz' does not exist
+ *
+ *   $ page-loader -o tmp https://scrapeme.live/shop/
+ *   > Path already exist: tmp/scrapeme-live-shop_files
+ */

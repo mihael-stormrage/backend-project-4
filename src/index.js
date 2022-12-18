@@ -7,7 +7,6 @@ import { addLogger } from 'axios-debug-log';
 
 addLogger(axios);
 const log = debug('page-loader');
-const returnLog = (msg) => log(msg) ?? msg;
 const throwLog = (msg, err) => {
   log(msg);
   throw err;
@@ -26,7 +25,7 @@ export default (url, out = process.cwd()) => axios(url).then(({ data }) => {
   log('loading DOM');
   const $ = cheerio.load(data);
   const promises = [];
-  const preparePromise = fs.mkdir(dirPath, { recursive: true }).then(() => $('img, link, script').each((i, e) => {
+  const preparePromise = fs.mkdir(dirPath).then(() => $('img, link, script').each((i, e) => {
     const attr = e.name === 'link' ? 'href' : 'src';
     const src = $(e).attr(attr);
     const assetUrl = new URL(src, urlObject);
@@ -45,4 +44,4 @@ export default (url, out = process.cwd()) => axios(url).then(({ data }) => {
   return preparePromise.then(() => Promise.all(promises))
     .then(() => fs.writeFile(filepath, $.html()))
     .then(() => filepath);
-}).catch(() => returnLog(`Error scrapping URL: ${url}`));
+});
