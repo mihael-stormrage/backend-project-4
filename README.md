@@ -20,7 +20,7 @@ Web-scrapper library with CLI
 
 For installation, testing and other purposes see [Makefile](./Makefile)
 
-[![asciicast](docs/demo.svg)](https://asciinema.org/a/XDgPzqfYWFuQkyVMkqZ2F8lL7)
+[![asciicast](docs/demo.svg)](https://asciinema.org/a/HxMxy33rbN9X5amQ7EvWbHsHd)
 ## Debug
 To enable debug log pass environment variable:
 ```sh

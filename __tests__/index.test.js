@@ -1,6 +1,8 @@
+import { jest } from '@jest/globals';
+import { AxiosError } from 'axios';
 import fs from 'node:fs/promises';
-import os from 'os';
-import path from 'path';
+import os from 'node:os';
+import path from 'node:path';
 import nock from 'nock';
 import * as cheerio from 'cheerio';
 import pageLoader, { makeFileName } from '../src';
@@ -17,6 +19,7 @@ let htmlFixture;
 let imgFixture;
 let cssFixture;
 let jsFixture;
+let printErr;
 
 beforeAll(async () => {
   url = new URL('https://ru.hexlet.io/courses');
@@ -29,6 +32,9 @@ beforeAll(async () => {
   pNock.get(/\/assets\/.+?\.png/).reply(200, imgFixture);
   pNock.get(/\/assets\/.+?\.css/).reply(200, cssFixture);
   pNock.get(/\/packs\/js\/.+?\.js/).reply(200, jsFixture);
+  const fNock = nock(/foo/).persist();
+  fNock.get(/\/\d{3}/).reply((uri) => [Number(uri.slice(1)), uri]);
+  printErr = jest.spyOn(console, 'error');
 });
 
 beforeEach(async () => {
@@ -37,6 +43,11 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await fs.rmdir(await tmpdir, { recursive: true });
+  printErr.mockClear();
+});
+
+afterAll(() => {
+  printErr.mockRestore();
 });
 
 test('filepath should be kebab-case', () => {
@@ -68,20 +79,30 @@ test('should output help', async () => {
   expect(actual).toBe(help);
 });
 
-/* TODO
- * Test exceptions:
- * - library should throw
- * - script should fail gracefully with:
- *   - proper exit code
- *   - user-friendly message
- *
- * test cases:
- *   $ page-loader -o /etc https://scrapeme.live/shop/
- *   > Permission denied: /etc/scrapeme-live-shop_files
- *
- *   $ page-loader -o /baz https://scrapeme.live/shop/
- *   > Output directory '/baz' does not exist
- *
- *   $ page-loader -o tmp https://scrapeme.live/shop/
- *   > Path already exist: tmp/scrapeme-live-shop_files
- */
+test('lib should throw', async () => {
+  const axiosError = pageLoader('https://foo/501', tmpdir);
+  await expect(axiosError).rejects.toThrow(/Request failed .* 501/);
+  await expect(axiosError).rejects.toThrow(AxiosError);
+
+  await expect(pageLoader(url.href, '/baz')).rejects.toThrow(/ENOENT/);
+  await expect(pageLoader(url.href, '/etc')).rejects.toThrow(/EACCES/);
+  await pageLoader(url.href, tmpdir);
+  await expect(pageLoader(url.href, tmpdir)).rejects.toThrow(/EEXIST/);
+});
+
+test('script should fail gracefully', async () => {
+  const promises = [
+    {
+      argv: ['-o', tmpdir, 'https://foo/500'],
+      expected: 'Request failed with status code 500 Internal Server Error at resource: https://foo/500',
+    },
+    { argv: ['-o', '/baz', url.href], expected: "Output directory '/baz' does not exist" },
+    { argv: ['-o', '/etc', url.href], expected: 'Permission denied: /etc/ru-hexlet-io-courses_files' },
+    { argv: ['-o', tmpdir, url.href], expected: '' },
+    { argv: ['-o', tmpdir, url.href], expected: 'Path already exist: ' },
+  ].map(async ({ argv, expected }) => {
+    await program.parseAsync(argv, { from: 'user' });
+    await expect(printErr).toHaveBeenCalledWith(expect.stringMatching(expected));
+  });
+  await Promise.all(promises);
+});

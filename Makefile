@@ -1,14 +1,11 @@
 install:
 	yarn
 
-start: install
-	npm start
-
-debug:
-	DEBUG=axios,page-loader npm start
-
 test:
-	DEBUG=axios,nock.*,page-loader npm test
+	npm test
+
+test-log:
+	DEBUG=axios,nock.*,page-loader make test
 
 coverage:
 	npm test -- --coverage

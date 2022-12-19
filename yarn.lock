@@ -432,7 +432,7 @@
 
 "@jest/globals@^29.3.1":
   version "29.3.1"
-  resolved "https://registry.npmjs.org/@jest/globals/-/globals-29.3.1.tgz"
+  resolved "https://registry.yarnpkg.com/@jest/globals/-/globals-29.3.1.tgz#92be078228e82d629df40c3656d45328f134a0c6"
   integrity sha512-cTicd134vOcwO59OPaB6AmdHQMCtWOe+/DitpTZVxWgMJ+YvXL1HNAmPyiGbSHmF/mXVBkvlm8YYtQhyHPnV6Q==
   dependencies:
     "@jest/environment" "^29.3.1"
