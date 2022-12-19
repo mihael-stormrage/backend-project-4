@@ -19,7 +19,7 @@ let htmlFixture;
 let imgFixture;
 let cssFixture;
 let jsFixture;
-let printErr;
+const spy = {};
 
 beforeAll(async () => {
   url = new URL('https://ru.hexlet.io/courses');
@@ -34,7 +34,8 @@ beforeAll(async () => {
   pNock.get(/\/packs\/js\/.+?\.js/).reply(200, jsFixture);
   const fNock = nock(/foo/).persist();
   fNock.get(/\/\d{3}/).reply((uri) => [Number(uri.slice(1)), uri]);
-  printErr = jest.spyOn(console, 'error');
+  spy.stderr = jest.spyOn(console, 'error').mockImplementation(() => {});
+  spy.stdout = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 
 beforeEach(async () => {
@@ -43,11 +44,11 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await fs.rmdir(await tmpdir, { recursive: true });
-  printErr.mockClear();
+  Object.values(spy).forEach((mock) => mock.mockClear());
 });
 
 afterAll(() => {
-  printErr.mockRestore();
+  Object.values(spy).forEach((mock) => mock.mockRestore());
 });
 
 test('filepath should be kebab-case', () => {
@@ -81,15 +82,17 @@ test('should output help', async () => {
 
 test('lib should throw', async () => {
   const axiosError = pageLoader('https://foo/501', tmpdir);
+  axiosError.catch(() => {});
   await expect(axiosError).rejects.toThrow(/Request failed .* 501/);
   await expect(axiosError).rejects.toThrow(AxiosError);
 
   await expect(pageLoader(url.href, '/baz')).rejects.toThrow(/ENOENT/);
   await expect(pageLoader(url.href, '/etc')).rejects.toThrow(/EACCES/);
-  await pageLoader(url.href, tmpdir);
+  await pageLoader(url.href, tmpdir); // not to throw? or catch it
   await expect(pageLoader(url.href, tmpdir)).rejects.toThrow(/EEXIST/);
 });
 
+// TODO: Add exit code check
 test('script should fail gracefully', async () => {
   const promises = [
     {
@@ -102,7 +105,7 @@ test('script should fail gracefully', async () => {
     { argv: ['-o', tmpdir, url.href], expected: 'Path already exist: ' },
   ].map(async ({ argv, expected }) => {
     await program.parseAsync(argv, { from: 'user' });
-    await expect(printErr).toHaveBeenCalledWith(expect.stringMatching(expected));
+    await expect(spy.stderr).toHaveBeenCalledWith(expect.stringMatching(expected));
   });
   await Promise.all(promises);
 });

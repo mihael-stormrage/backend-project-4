@@ -27,7 +27,7 @@ const handler = (url, { output }) => pageLoader(url, output)
     throw err.message;
   }).catch(console.error);
 
-program.name('page-loader').version('1.0.0')
+program.name('page-loader').version('1.3.3')
   .description('Page loader utility')
   .arguments('<url>')
   .option('-o --output [dir]', 'output dir', process.cwd())
