@@ -9,9 +9,12 @@ extends:
   - airbnb-base
   - plugin:jest/recommended
 
+parser: '@babel/eslint-parser'
+
 parserOptions:
   ecmaVersion: 13
   sourceType: module
+  requireConfigFile: false
 
 rules:
   no-console: 0

@@ -6,7 +6,7 @@ import path from 'node:path';
 import nock from 'nock';
 import * as cheerio from 'cheerio';
 import pageLoader, { makeFileName } from '../src';
-import program from '../src/cli.js';
+import program from '../src/cli';
 
 nock.disableNetConnect();
 

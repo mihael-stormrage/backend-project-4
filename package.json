@@ -1,6 +1,6 @@
 {
   "name": "@hexlet/code",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "type": "module",
   "main": "src/index.js",
   "repository": "git@github.com:mihael-stormrage/backend-project-4.git",
@@ -14,10 +14,11 @@
     "test": "jest --colors"
   },
   "jest": {
-    "testEnvironment": "node",
-    "transform": {}
+    "testEnvironment": "node"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/plugin-syntax-import-assertions": "^7.20.0",
     "@jest/globals": "^29.3.1",
     "eslint": "^8.28.0",
     "eslint-config-airbnb-base": "^15.0.0",

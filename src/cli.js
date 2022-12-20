@@ -4,6 +4,7 @@ import { STATUS_CODES } from 'http';
 import { AxiosError } from 'axios';
 import { Command } from 'commander';
 import pageLoader from './index.js';
+import packageJSON from '../package.json' assert { type: 'json' };
 
 const log = debug('page-loader');
 
@@ -27,7 +28,7 @@ const handler = (url, { output }) => pageLoader(url, output)
     throw err.message;
   }).catch(console.error);
 
-program.name('page-loader').version('1.3.3')
+program.name('page-loader').version(packageJSON.version)
   .description('Page loader utility')
   .arguments('<url>')
   .option('-o --output [dir]', 'output dir', process.cwd())
