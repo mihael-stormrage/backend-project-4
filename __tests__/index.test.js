@@ -82,13 +82,12 @@ test('should output help', async () => {
 
 test('lib should throw', async () => {
   const axiosError = pageLoader('https://foo/501', tmpdir);
-  axiosError.catch(() => {});
   await expect(axiosError).rejects.toThrow(/Request failed .* 501/);
   await expect(axiosError).rejects.toThrow(AxiosError);
 
   await expect(pageLoader(url.href, '/baz')).rejects.toThrow(/ENOENT/);
   await expect(pageLoader(url.href, '/etc')).rejects.toThrow(/EACCES/);
-  await pageLoader(url.href, tmpdir); // not to throw? or catch it
+  await pageLoader(url.href, tmpdir).catch(() => {}); // not to throw? or catch it
   await expect(pageLoader(url.href, tmpdir)).rejects.toThrow(/EEXIST/);
 });
 
@@ -108,4 +107,5 @@ test('script should fail gracefully', async () => {
     await expect(spy.stderr).toHaveBeenCalledWith(expect.stringMatching(expected));
   });
   await Promise.all(promises);
+  process.exitCode = 0;
 });
